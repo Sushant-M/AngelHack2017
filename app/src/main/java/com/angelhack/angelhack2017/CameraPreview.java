@@ -1,14 +1,22 @@
 package com.angelhack.angelhack2017;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
 import android.os.Build;
+import android.renderscript.RenderScript;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Display;
@@ -18,9 +26,13 @@ import android.view.SurfaceView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import io.github.silvaren.easyrs.tools.Nv21Image;
+
+import static android.R.attr.end;
 import static android.R.attr.format;
 import static android.R.attr.height;
 import static android.R.attr.width;
+import static android.graphics.ImageFormat.YUV_420_888;
 
 /**
  * This class assumes the parent layout is RelativeLayout.LayoutParams.
@@ -43,6 +55,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private LayoutMode mLayoutMode;
     private int mCenterPosX = -1;
     private int mCenterPosY;
+    private String TAG = getClass().getSimpleName();
+    boolean lol = false;
 
     PreviewReadyCallback mPreviewReadyCallback = null;
 
@@ -65,12 +79,38 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         @Override
         public void onPreviewFrame(byte[] bytes, Camera camera) {
-            String encoded = Base64.encodeToString(bytes,0);
-            String s = new String(bytes);
-            //Log.d("ATTENTION HERE!",encoded);
-            new SendImage().execute(bytes);
+            android.support.v8.renderscript.RenderScript renderScript = android.support.v8.renderscript.RenderScript.create(getContext());
+
+            Bitmap outputBitmap = Nv21Image.nv21ToBitmap(renderScript, bytes, 200, 200);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            outputBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] imageBytes = baos.toByteArray();
+            String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+
+            if(!lol) {
+                Log.d(TAG,encodedImage);
+                new SendImage().execute(encodedImage);
+                lol = true;
+            }
+
+            //Log.d("ATTENTION HERE!",s);
         }
     };
+
+    public String resizePicture(String base64array){
+        byte[] encodeByte = Base64.decode(base64array.getBytes(),Base64.DEFAULT);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPurgeable = true;
+        Bitmap image = BitmapFactory.decodeByteArray(encodeByte,0,encodeByte.length,options);
+
+        image = Bitmap.createScaledBitmap(image,400,400,false);
+        ByteArrayOutputStream boas = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.PNG,100,boas);
+        byte[] b = boas.toByteArray();
+        System.gc();
+        return Base64.encodeToString(b,Base64.NO_WRAP);
+    }
 
     public CameraPreview(Activity activity, int cameraId, LayoutMode mode) {
         super(activity); // Always necessary

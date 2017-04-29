@@ -10,9 +10,8 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        jackOptions {
-            enabled true
-        }
+        renderscriptTargetApi 16
+        renderscriptSupportModeEnabled true
     }
     buildTypes {
         release {
@@ -21,8 +20,7 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+
     }
 }
 
@@ -35,4 +33,6 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha9'
     testCompile 'junit:junit:4.12'
     compile 'com.github.niqdev:mjpeg-view:1.1.0'
+    compile 'io.github.silvaren:easyrs:0.5.3'
+
 }

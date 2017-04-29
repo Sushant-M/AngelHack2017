@@ -10,6 +10,7 @@
 
     <application
         xmlns:tools="http://schemas.android.com/tools"
+        android:largeHeap="true"
         tools:replace="android:theme"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
