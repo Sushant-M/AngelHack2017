@@ -13,7 +13,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         relativeLayout = new RelativeLayout(this);
         setContentView(relativeLayout);
-        new SendImage().execute("Hello");
+        //new SendImage().execute();
     }
 
     @Override
