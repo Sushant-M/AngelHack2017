@@ -68,7 +68,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             String encoded = Base64.encodeToString(bytes,0);
             String s = new String(bytes);
             //Log.d("ATTENTION HERE!",encoded);
-            new SendImage().execute(s);
+            new SendImage().execute(bytes);
         }
     };
 
